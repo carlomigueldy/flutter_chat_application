@@ -1,27 +1,27 @@
 import 'package:injectable/injectable.dart';
 
-import '../../models/user.dart' show User;
+import '../../models/app_user.dart' show AppUser;
 import 'base_service.dart' show BaseService;
 
 @lazySingleton
-class UserService implements BaseService<User> {
+class UserService implements BaseService<AppUser> {
   @override
   String endpoint;
 
   @override
-  Future<List<User>> fetchAll() {
+  Future<List<AppUser>> fetchAll() {
     // TODO: implement fetchAll
     throw UnimplementedError();
   }
 
   @override
-  Future<User> fetchById({int id}) {
+  Future<AppUser> fetchById({int id}) {
     // TODO: implement fetchById
     throw UnimplementedError();
   }
 
   @override
-  Future<User> requestCreate({User model}) {
+  Future<AppUser> requestCreate({AppUser model}) {
     // TODO: implement requestCreate
     throw UnimplementedError();
   }
@@ -45,7 +45,7 @@ class UserService implements BaseService<User> {
   }
 
   @override
-  Future<User> requestUpdate({User model, int id}) {
+  Future<AppUser> requestUpdate({AppUser model, int id}) {
     // TODO: implement requestUpdate
     throw UnimplementedError();
   }

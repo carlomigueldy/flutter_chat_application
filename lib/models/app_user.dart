@@ -1,12 +1,12 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'user.g.dart';
+part 'app_user.g.dart';
 
 @JsonSerializable(
   nullable: false,
   fieldRename: FieldRename.snake,
 )
-class User {
+class AppUser {
   final int id;
   final String avatar;
   final String username;
@@ -19,7 +19,7 @@ class User {
   final String phoneNumber;
   final String timeZone;
 
-  User({
+  AppUser({
     this.id,
     this.avatar: "",
     this.username: "",
@@ -33,6 +33,7 @@ class User {
     this.timeZone: "",
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
-  Map<String, dynamic> toJson() => _$UserToJson(this);
+  factory AppUser.fromJson(Map<String, dynamic> json) =>
+      _$AppUserFromJson(json);
+  Map<String, dynamic> toJson() => _$AppUserToJson(this);
 }

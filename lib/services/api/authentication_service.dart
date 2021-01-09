@@ -4,12 +4,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:observable_ish/observable_ish.dart';
 import 'package:injectable/injectable.dart';
 import 'package:stacked/stacked.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dio/dio.dart';
 
 import '../../app/exceptions/handler.dart';
 import '../../app/utils/device.dart';
 import '../../app/http.dart';
-import '../../models/user.dart';
+import '../../models/app_user.dart';
 import '../../app/routes.gr.dart';
 import '../../app/locator.dart';
 import '../alert_service.dart';
@@ -23,6 +24,14 @@ class AuthenticationService with ReactiveServiceMixin {
   final _alertService = locator<AlertService>();
   final _exceptionHandler = locator<ExceptionHandler>();
   final _deviceInfo = locator<AppDeviceInfo>();
+  final FirebaseAuth auth = FirebaseAuth.instance
+    ..authStateChanges().listen((User user) {
+      if (user == null) {
+        print('User is currently signed out!');
+      } else {
+        print('User is signed in!');
+      }
+    });
 
   Future<SharedPreferences> _localStorage = SharedPreferences.getInstance();
 
@@ -145,8 +154,8 @@ class AuthenticationService with ReactiveServiceMixin {
         options: authorizationHeader(),
       );
 
-      User data = User.fromJson(response.data);
-      _user.value = data;
+      // User data = User.fromJson(response.data);
+      // _user.value = data;
     } on DioError catch (e) {
       _exceptionHandler.handleError(e);
     }
@@ -163,7 +172,7 @@ class AuthenticationService with ReactiveServiceMixin {
       );
 
       deleteToken();
-      _user.value = User(id: 0);
+      // _user.value = User(id: 0);
       _alertService.showSnackbar(
         message: "You have logged out.",
         type: SnackBarType.INFO,

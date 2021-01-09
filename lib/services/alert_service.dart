@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:injectable/injectable.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -27,26 +26,7 @@ class AlertService {
   }) {
     _snackbarService.showCustomSnackBar(
       message: message,
-      icon: getIconByType(type),
-
-      // backgroundColor: Colors.white,
-      // messageText: Text(
-      //   message,
-      //   style: TextStyle(color: Colors.black),
-      // ),
-
-      // borderRadius: 15,
-      // margin: EdgeInsets.all(5),
-      padding: EdgeInsets.symmetric(
-        horizontal: 30,
-        vertical: 20,
-      ),
-      shouldIconPulse: false,
-      snackStyle: SnackStyle.FLOATING,
-      snackPosition: SnackPosition.BOTTOM,
-      // dismissDirection: SnackDismissDirection.HORIZONTAL,
       duration: const Duration(seconds: 3),
-      isDismissible: true,
     );
   }
 

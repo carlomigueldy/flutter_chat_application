@@ -16,9 +16,9 @@ class HomeView extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(9.0),
-                child: Text(model.user.fullName ?? 'anonymous user'),
+                child: Text('anonymous user'),
               ),
-              RaisedButton(
+              MaterialButton(
                 onPressed: () => model.logout(),
                 child: Text('LOGOUT'),
               ),
