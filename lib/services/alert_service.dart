@@ -2,13 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import '../app/utils/setup_snackbar_ui.dart';
 import '../app/locator.dart';
-
-enum SnackBarType {
-  SUCCESS,
-  ERROR,
-  INFO,
-}
 
 @lazySingleton
 class AlertService {
@@ -22,11 +17,21 @@ class AlertService {
   /// @return void
   void showSnackbar({
     @required String message,
-    SnackBarType type,
+    SnackBarType type: SnackBarType.BASIC,
+    String title: 'Alert',
+    String mainButtonTitle,
+    Function onMainButtonTapped,
+    Function onTap,
+    Duration duration: const Duration(seconds: 3),
   }) {
     _snackbarService.showCustomSnackBar(
+      title: title,
+      variant: type,
       message: message,
-      duration: const Duration(seconds: 3),
+      duration: duration,
+      // onTap: onTap,
+      // onMainButtonTapped: onMainButtonTapped,
+      // mainButtonTitle: mainButtonTitle,
     );
   }
 
