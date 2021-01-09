@@ -40,7 +40,8 @@ class LoginView extends StatelessWidget {
                 child: Container(
                   height: 70,
                   width: double.infinity,
-                  child: RaisedButton(
+                  child: MaterialButton(
+                    color: Colors.blue,
                     child: Text(
                       'Login',
                       style: TextStyle(fontSize: 24),
@@ -53,12 +54,17 @@ class LoginView extends StatelessWidget {
                         });
 
                         await model.login(
-                            email: _textController['email'].text,
-                            password: _textController['password'].text);
+                          email: _textController['email'].text,
+                          password: _textController['password'].text,
+                        );
                       }
                     },
                   ),
                 ),
+              ),
+              MaterialButton(
+                child: Text('Test Snackbar'),
+                onPressed: () => model.testSnackbar(),
               )
             ],
           ),

@@ -7,10 +7,10 @@ import 'package:stacked/stacked.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:dio/dio.dart';
 
+import '../../app/utils/setup_snackbar_ui.dart';
 import '../../app/exceptions/handler.dart';
 import '../../app/utils/device.dart';
 import '../../app/http.dart';
-import '../../models/app_user.dart';
 import '../../app/routes.gr.dart';
 import '../../app/locator.dart';
 import '../alert_service.dart';
@@ -18,25 +18,28 @@ import 'models/authentication_response.dart';
 
 @lazySingleton
 class AuthenticationService with ReactiveServiceMixin {
-  /// Here we instantiate all the services and
-  /// other classes that this [AuthenticationService] requires.
-  final _navigationService = locator<NavigationService>();
-  final _alertService = locator<AlertService>();
-  final _exceptionHandler = locator<ExceptionHandler>();
-  final _deviceInfo = locator<AppDeviceInfo>();
-  final FirebaseAuth auth = FirebaseAuth.instance
-    ..authStateChanges().listen((User user) {
-      if (user == null) {
-        print('User is currently signed out!');
-      } else {
-        print('User is signed in!');
-      }
-    });
+  final NavigationService _navigationService = locator<NavigationService>();
+  final AlertService _alertService = locator<AlertService>();
+  final ExceptionHandler _exceptionHandler = locator<ExceptionHandler>();
+  final AppDeviceInfo _deviceInfo = locator<AppDeviceInfo>();
+  final FirebaseAuth _firebaseAuthService = FirebaseAuth.instance;
 
   Future<SharedPreferences> _localStorage = SharedPreferences.getInstance();
 
   AuthenticationService() {
     listenToReactiveValues([_token]);
+
+    _firebaseAuthService
+      ..authStateChanges().listen((User user) {
+        if (user == null) {
+          print('User is currently signed out!');
+        } else {
+          print('User is signed in!');
+          _user.value = user;
+
+          print(_user.value);
+        }
+      });
   }
 
   /// @return [String] token
@@ -77,35 +80,45 @@ class AuthenticationService with ReactiveServiceMixin {
   ///
   /// @param [EmailCredential] credentials A map containing email and password
   /// @return void
-  Future loginWithEmail({
+  Future<UserCredential> loginWithEmail({
     @required String email,
     @required String password,
   }) async {
     try {
-      Response response = await dio.post(
-        '/api/auth/login',
-        data: {
-          "email": email,
-          "password": password,
-          "device_name": await _deviceInfo.getDeviceName(),
-        },
-        options: Options(headers: headers),
-      );
+      UserCredential userCredential = await _firebaseAuthService
+          .signInWithEmailAndPassword(email: email, password: password);
 
-      AuthenticationResponse data =
-          AuthenticationResponse.fromJson(response.data);
-      _token.value = data.accessToken;
-      setToken(data.accessToken);
-      await fetchUser();
+      _user.value = userCredential.user;
+
+      print(userCredential);
+
+      // Response response = await dio.post(
+      //   '/api/auth/login',
+      //   data: {
+      //     "email": email,
+      //     "password": password,
+      //     "device_name": await _deviceInfo.getDeviceName(),
+      //   },
+      //   options: Options(headers: headers),
+      // );
+
+      // // AuthenticationResponse data =
+      // //     AuthenticationResponse.fromJson(response.data);
+      // // _token.value = data.accessToken;
+      // setToken(data.accessToken);
+
+      // await fetchUser();
       _alertService.showSnackbar(
         message: "You have logged in.",
         type: SnackBarType.SUCCESS,
       );
-      _navigationService.pushNamedAndRemoveUntil(Routes.homeView);
 
-      return response;
+      return userCredential;
     } on DioError catch (e) {
-      _exceptionHandler.handleError(e);
+      _alertService.showSnackbar(
+        message: _exceptionHandler.getErrorMessage(e),
+        type: SnackBarType.ERROR,
+      );
     }
   }
 
@@ -140,7 +153,10 @@ class AuthenticationService with ReactiveServiceMixin {
 
       return response;
     } on DioError catch (e) {
-      _exceptionHandler.handleError(e);
+      _alertService.showSnackbar(
+        message: _exceptionHandler.getErrorMessage(e),
+        type: SnackBarType.ERROR,
+      );
     }
   }
 
@@ -157,7 +173,10 @@ class AuthenticationService with ReactiveServiceMixin {
       // User data = User.fromJson(response.data);
       // _user.value = data;
     } on DioError catch (e) {
-      _exceptionHandler.handleError(e);
+      _alertService.showSnackbar(
+        message: _exceptionHandler.getErrorMessage(e),
+        type: SnackBarType.ERROR,
+      );
     }
   }
 
@@ -166,12 +185,9 @@ class AuthenticationService with ReactiveServiceMixin {
   /// @return void
   Future logout() async {
     try {
-      await dio.delete(
-        '/api/auth/logout',
-        options: authorizationHeader(),
-      );
+      await _firebaseAuthService.signOut();
 
-      deleteToken();
+      // deleteToken();
       // _user.value = User(id: 0);
       _alertService.showSnackbar(
         message: "You have logged out.",
@@ -179,7 +195,10 @@ class AuthenticationService with ReactiveServiceMixin {
       );
       _navigationService.pushNamedAndRemoveUntil(Routes.mainView);
     } on DioError catch (e) {
-      _exceptionHandler.handleError(e);
+      _alertService.showSnackbar(
+        message: _exceptionHandler.getErrorMessage(e),
+        type: SnackBarType.ERROR,
+      );
     }
   }
 
